@@ -1,6 +1,6 @@
-# msgpack
+# messagepack
 
-Streaming API implementation of [MessagePack](https://msgpack.org/) binary serialization format.
+Streaming API implementation of [msgpack](https://msgpack.org/) binary serialization format.
 
 ## Installing
 
@@ -40,7 +40,8 @@ Packer and Unpacker classes provide Streaming API for serializing and deserializ
 * pack Map or Iterable header length 
 * manually pack all items 
 
-Only need put length header before packing items
+Only need put length header before packing items 
+
 After packing all items no need to stop  or finish or end this map / iterable
 
 ```

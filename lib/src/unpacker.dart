@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
-/// Streaming API for unpacking (deserializing) data from MsgPack binary format.
+/// Streaming API for unpacking (deserializing) data from msgpack binary format.
 ///
 /// unpackXXX methods returns value if it exist, or `null`.
 /// Throws [FormatException] if value is not an requested type,
@@ -142,7 +142,7 @@ class Unpacker {
 
   /// Unpack [Iterable.length] if packed value is an [Iterable] or `null`.
   ///
-  /// Encoded in MsgPack packet null or 0 length unpacks to 0 for convenience.
+  /// Encoded in msgpack packet null or 0 length unpacks to 0 for convenience.
   /// Items of the [Iterable] must be unpacked manually with respect to returned `length`
   /// Throws [FormatException] if value is not an [Iterable].
   int unpackIterableLength() {
@@ -169,7 +169,7 @@ class Unpacker {
 
   /// Unpack [Map.length] if packed value is an [Map] or `null`.
   ///
-  /// Encoded in MsgPack packet null or 0 length unpacks to 0 for convenience.
+  /// Encoded in msgpack packet null or 0 length unpacks to 0 for convenience.
   /// Items of the [Map] must be unpacked manually with respect to returned `length`
   /// Throws [FormatException] if value is not an [Map].
   int unpackMapLength() {
@@ -196,7 +196,7 @@ class Unpacker {
 
   /// Unpack value if packed value is binary or `null`.
   ///
-  /// Encoded in MsgPack packet null unpacks to [List] with 0 length for convenience.
+  /// Encoded in msgpack packet null unpacks to [List] with 0 length for convenience.
   /// Throws [FormatException] if value is not a binary.
   List<int> unpackBinary() {
     final b = _d.getUint8(_offset);

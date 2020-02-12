@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:math';
 
 
-import 'package:msgpack/msgpack.dart';
+import 'package:messagepack/messagepack.dart';
 import 'package:test/test.dart';
 
 int packUnpackInt(int v, {bool negative = false}) {

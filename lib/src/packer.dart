@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
-/// Streaming API for packing (serializing) data to MsgPack binary format.
+/// Streaming API for packing (serializing) data to msgpack binary format.
 ///
 /// Packer provide API for manually packing your data item by item in serial / streaming manner.
 /// Use methods packXXX, where XXX is type names. Methods can take value and `null`.
@@ -181,7 +181,7 @@ class Packer {
 
   /// Convenient function that call [packString(v)] by passing empty [String] as `null`.
   ///
-  /// Convenient when you not distinguish between empty [String] and null on MsgPack wire.
+  /// Convenient when you not distinguish between empty [String] and null on msgpack wire.
   /// See [packString(v)] method documentation for more details.
   void packStringEmptyIsNull(String v) {
     if (v == null || v.isEmpty)

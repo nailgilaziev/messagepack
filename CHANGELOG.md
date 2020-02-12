@@ -1,3 +1,3 @@
-## [0.1.0]  
+## [0.1.0-dev.1]  
 
-* Tested and functional streaming API
+* Pre release tested and functional streaming API
