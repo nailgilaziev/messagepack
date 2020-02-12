@@ -1,10 +1,9 @@
 import 'dart:convert';
-import 'dart:ffi';
 import 'dart:math';
 
-import 'package:flutter_test/flutter_test.dart';
 
 import 'package:msgpack/msgpack.dart';
+import 'package:test/test.dart';
 
 int packUnpackInt(int v, {bool negative = false}) {
   final p = Packer();
