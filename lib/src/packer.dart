@@ -2,10 +2,20 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
-/// packXXX can handle null values.
-/// separate packNull function exist.
+/// Streaming API for packing (serializing) data to MsgPack binary format.
+///
+/// Packer provide API for manually packing your data item by item in serial / streaming manner.
+/// Use methods packXXX, where XXX is type names. Methods can take value and `null`.
+/// If `null` provided for packXXX method it will be packed to `null` implicitly.
+/// For explicitly packing `null` separate packNull function exist.
+///
+/// Streaming packing requires buffer to collect your data.
+/// Try to figure out the best initial size of this buffer, that minimal enough to fit your most common data packing scenario.
+/// Try to find balance. Provide this value in constructor [Packer()]
 class Packer {
-  /// Provide the size, that minimal enough to fit your most used data packets.
+  /// Provide the [_bufSize] size, that minimal enough to fit your most used data packets.
+  /// Try to find balance, small buffer is good, and if most of your data will fit to it, performance will be good.
+  /// If buffer not enough it will be increased automatically.
   Packer([this._bufSize = 64]) {
     _newBuf(_bufSize);
   }
@@ -169,15 +179,15 @@ class Packer {
     _putBytes(encoded);
   }
 
-  /// Convenient function that call [packString(String v)] by passing empty [String] as `null`.
+  /// Convenient function that call [packString(v)] by passing empty [String] as `null`.
   ///
   /// Convenient when you not distinguish between empty [String] and null on MsgPack wire.
-  /// See [packString()] method documentation for more details.
+  /// See [packString(v)] method documentation for more details.
   void packStringEmptyIsNull(String v) {
-    if (v == null)
+    if (v == null || v.isEmpty)
       packNull();
     else
-      packString(v.isEmpty ? null : v);
+      packString(v);
   }
 
   /// Pack `List<int>` or null.

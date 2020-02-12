@@ -1,17 +1,19 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
-/// Streaming unpaker
+/// Streaming API for unpacking (deserializing) data from MsgPack binary format.
 ///
 /// unpackXXX methods returns value if it exist, or `null`.
 /// Throws [FormatException] if value is not an requested type,
 /// but in that case throwing exception not corrupt internal state,
 /// so other unpackXXX methods can be called after that.
-///
-/// Note: In source code `_offset += 3;` with odd values (3) means,
-/// that 1 byte read for header and 2 bytes read for data itself.
 class Unpacker {
+  /// Manipulates with provided [Uint8List] to sequentially unpack values.
+  /// Use [Unpaker.fromList()] to unpack raw `List<int>` bytes.
   Unpacker(this._list) : _d = ByteData.view(_list.buffer, _list.offsetInBytes);
+
+  ///Convenient
+  Unpacker.fromList(List<int> l) :this(Uint8List.fromList(l));
 
   final Uint8List _list;
   final ByteData _d;
@@ -133,7 +135,7 @@ class Unpacker {
       throw _formatException('String', b);
     }
     final data =
-        Uint8List.view(_list.buffer, _list.offsetInBytes + _offset, len);
+    Uint8List.view(_list.buffer, _list.offsetInBytes + _offset, len);
     _offset += len;
     return _strCodec.decode(data);
   }
@@ -215,11 +217,12 @@ class Unpacker {
       throw _formatException('Binary', b);
     }
     final data =
-        Uint8List.view(_list.buffer, _list.offsetInBytes + _offset, len);
+    Uint8List.view(_list.buffer, _list.offsetInBytes + _offset, len);
     _offset += len;
     return data.toList();
   }
 
-  Exception _formatException(String type, int b) => FormatException(
-      'Try to unpack $type value, but it\'s not an $type, byte = $b');
+  Exception _formatException(String type, int b) =>
+      FormatException(
+          'Try to unpack $type value, but it\'s not an $type, byte = $b');
 }

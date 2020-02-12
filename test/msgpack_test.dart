@@ -281,22 +281,22 @@ void main() {
 
   test('Map [dependent]', () {
     final map = {
-      1:11,
-      2:22,
-      3:33,
+      1: 11,
+      2: 22,
+      3: 33,
     };
     final p = Packer();
     p.packNull();
     p.packMapLength(null);
     p.packMapLength(0);
     p.packMapLength(map.length);
-    for(int i=0;i<map.length;i++){
+    for (int i = 0; i < map.length; i++) {
       p.packInt(i);
       p.packInt(map[i]);
     }
     p.packBool(true);
     p.packMapLength(map.length);
-    for(int i=0;i<map.length;i++){
+    for (int i = 0; i < map.length; i++) {
       p.packInt(i);
       p.packInt(map[i]);
     }
@@ -321,7 +321,8 @@ void main() {
 
   test('Binary [dependent]', () {
     final bytes1 = utf8.encode('hi');
-    final bytes2 = utf8.encode('Значимость этих проблем настолько очевидна, что укрепление и развитие структуры представляет собой интересный эксперимент проверки систем массового участия. Задача организации, в особенности же постоянное информационно-пропагандистское обеспечение нашей деятельности обеспечивает широкому кругу (специалистов) участие в формировании систем массового участия. Товарищи! постоянный количественный рост и сфера нашей активности требуют определения и уточнения соответствующий условий активизации. Задача организации, в особенности же консультация с широким активом влечет за собой процесс внедрения и модернизации форм развития. Равным образом начало повседневной работы по формированию позиции позволяет оценить значение соответствующий условий активизации.');
+    final bytes2 = utf8.encode(
+        'Значимость этих проблем настолько очевидна, что укрепление и развитие структуры представляет собой интересный эксперимент проверки систем массового участия. Задача организации, в особенности же постоянное информационно-пропагандистское обеспечение нашей деятельности обеспечивает широкому кругу (специалистов) участие в формировании систем массового участия. Товарищи! постоянный количественный рост и сфера нашей активности требуют определения и уточнения соответствующий условий активизации. Задача организации, в особенности же консультация с широким активом влечет за собой процесс внедрения и модернизации форм развития. Равным образом начало повседневной работы по формированию позиции позволяет оценить значение соответствующий условий активизации.');
     final empty = <int>[];
     final p = Packer();
     p.packBinary(null);
@@ -338,6 +339,32 @@ void main() {
     expect(u.unpackBinary(), equals(bytes2));
     expect(u.unpackInt(), equals(3));
   });
+
+  test('Manual int example [dependent]', () {
+    final p = Packer();
+    p.packInt(1);
+    p.packInt(2);
+    final bytes = p.takeBytes();
+    //send bytes to server
+    //receive bytes from server
+    final u = Unpacker(bytes);
+    final n1 = u.unpackInt();
+    final n2 = u.unpackInt();
+    expect(n1, equals(1));
+    expect(n2, equals(2));
+  });
+
+  test('Map Iterable example [dependent]', () {
+    final list = ['i1','i2'];
+    final map = {'k1': 11, 'k2': 22};
+    final p = Packer();
+    p.packIterableLength(list.length);
+    list.forEach(p.packString);
+    p.packMapLength(map.length);
+    map.forEach((key, v) {
+      p.packString(key);
+      p.packInt(v);
+    });
+    final bytes = p.takeBytes();
+  });
 }
-
-
