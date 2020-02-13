@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:math';
 
-
 import 'package:messagepack/messagepack.dart';
 import 'package:test/test.dart';
 
@@ -354,7 +353,7 @@ void main() {
   });
 
   test('Map Iterable example [dependent]', () {
-    final list = ['i1','i2'];
+    final list = ['i1', 'i2'];
     final map = {'k1': 11, 'k2': 22};
     final p = Packer();
     p.packIterableLength(list.length);
@@ -365,5 +364,25 @@ void main() {
       p.packInt(v);
     });
     final bytes = p.takeBytes();
+    Unpacker(bytes);
+  });
+
+  test('Different types example [dependent]', () {
+    final p = Packer()
+      ..packInt(99)
+      ..packBool(true)
+      ..packString('hi')
+      ..packNull()
+      ..packString(null)
+      ..packBinary(<int>[104, 105]) // hi codes
+      ..packIterableLength(2) // pack 2 elements list ['elem1',3.14]
+      ..packString('elem1')
+      ..packDouble(3.14)
+      ..packString('continue to pack other elements')
+      ..packMapLength(1) //map {'key1':false}
+      ..packString('key');
+
+    final bytes = p.takeBytes();
+    Unpacker(bytes);
   });
 }

@@ -5,8 +5,5 @@
 /// For working with iterables and maps - write header before and after manually pack items
 library messagepack;
 
-
 export 'src/packer.dart';
 export 'src/unpacker.dart';
-
-

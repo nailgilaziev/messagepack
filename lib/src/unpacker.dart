@@ -13,7 +13,7 @@ class Unpacker {
   Unpacker(this._list) : _d = ByteData.view(_list.buffer, _list.offsetInBytes);
 
   ///Convenient
-  Unpacker.fromList(List<int> l) :this(Uint8List.fromList(l));
+  Unpacker.fromList(List<int> l) : this(Uint8List.fromList(l));
 
   final Uint8List _list;
   final ByteData _d;
