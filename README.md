@@ -1,5 +1,7 @@
 Streaming API implementation of [MessagePack](https://msgpack.org/) binary serialization format - msgpack.
 
+[![pub package](https://img.shields.io/pub/v/image_picker.svg)](https://pub.dartlang.org/packages/messagepack)
+
 # Getting Started
 
 `Packer` and `Unpacker` classes provide Streaming API for serializing and deserializing data.
@@ -116,6 +118,9 @@ Call .takeBytes() only once. It returns Uint8List of packed bytes.
 After that call don't continue to use Packer instance (don't call .packXXX() methods and .takeBytes())
 Instead, create new Packer instance method.
 
+## Motivation for creating this package
+
+No other packages available that give streaming API for processing data 
 
 # Roadmap
 
