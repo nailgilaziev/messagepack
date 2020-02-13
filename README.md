@@ -1,6 +1,6 @@
 Streaming API implementation of [MessagePack](https://msgpack.org/) binary serialization format - msgpack.
 
-[![pub package](https://img.shields.io/pub/v/image_picker.svg)](https://pub.dartlang.org/packages/messagepack)
+[![pub package](https://img.shields.io/pub/v/messagepack.svg)](https://pub.dartlang.org/packages/messagepack)
 
 # Getting Started
 
