@@ -138,7 +138,7 @@ class Unpacker {
       throw _formatException('String', b);
     }
     final data =
-    Uint8List.view(_list.buffer, _list.offsetInBytes + _offset, len);
+        Uint8List.view(_list.buffer, _list.offsetInBytes + _offset, len);
     _offset += len;
     return _strCodec.decode(data);
   }
@@ -220,7 +220,7 @@ class Unpacker {
       throw _formatException('Binary', b);
     }
     final data =
-    Uint8List.view(_list.buffer, _list.offsetInBytes + _offset, len);
+        Uint8List.view(_list.buffer, _list.offsetInBytes + _offset, len);
     _offset += len;
     return data.toList();
   }
@@ -263,7 +263,7 @@ class Unpacker {
   ///
   /// Return types declared as [Object] instead of `dynamic` for safety reasons.
   /// You need explicitly cast to proper types. And in case with [Object]
-  /// compiler checks will force yo to do it whereas with `dynamic` it will not.
+  /// compiler checks will force you to do it whereas with `dynamic` it will not.
   List<Object> unpackList() {
     final length = unpackListLength();
     final list = List<Object>(length);
@@ -277,7 +277,7 @@ class Unpacker {
   ///
   /// Return types declared as [Object] instead of `dynamic` for safety reasons.
   /// You need explicitly cast to proper types. And in case with [Object]
-  /// compiler checks will force yo to do it whereas with `dynamic` it will not.
+  /// compiler checks will force you to do it whereas with `dynamic` it will not.
   Map<Object, Object> unpackMap() {
     final length = unpackMapLength();
     final map = <Object, Object>{};
@@ -287,7 +287,6 @@ class Unpacker {
     return map;
   }
 
-  Exception _formatException(String type, int b) =>
-      FormatException(
-          'Try to unpack $type value, but it\'s not an $type, byte = $b');
+  Exception _formatException(String type, int b) => FormatException(
+      'Try to unpack $type value, but it\'s not an $type, byte = $b');
 }
