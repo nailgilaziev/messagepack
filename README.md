@@ -122,10 +122,10 @@ More examples can be found in:
 
 ### Don't use Packer after calling .takeBytes()
 
-Internally it cleans up underlying _builder, so further behaviour will be useless.  
-Call .takeBytes() only once. It returns Uint8List of packed bytes.
-After that call don't continue to use Packer instance (don't call .packXXX() methods and .takeBytes())
-Instead, create new Packer instance method.
+Internally it cleans up underlying `_builder`, so further behaviour will be useless.  
+Call `.takeBytes()` only once. It returns `Uint8List` of packed bytes.  
+After that don't continue to use `Packer` instance (don't call `.packXXX()` methods and `.takeBytes()` anymore).  
+Instead create new `Packer` instance.
 
 ### Motivation for creating this package
 
