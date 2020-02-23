@@ -1,6 +1,8 @@
 ## [0.1.1]
 
-* New functions for implicitly/automatically unpack Maps and Lists without using Streaming API directly.
+* New functions for _implicitly/automatically_ unpack `Map` and `List` items without using **Streaming API** directly.
+* * `unpackList()`
+* * `unpackMap()`
 * Refactored tests and added more tests
 * Improved documentation
 
