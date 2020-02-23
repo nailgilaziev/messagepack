@@ -216,8 +216,8 @@ class Packer {
     _putBytes(buffer);
   }
 
-  /// Pack [Iterable.length] or `null`.
-  void packIterableLength(int length) {
+  /// Pack [List.length] or `null`.
+  void packListLength(int length) {
     // max 4 length header + 1 control byte
     if (_buf.length - _offset < 5) _nextBuf();
     if (length == null) {
@@ -233,7 +233,7 @@ class Packer {
       _d.setUint32(_offset, length);
       _offset += 4;
     } else {
-      throw ArgumentError('Max iterable length is 0xFFFFFFFF');
+      throw ArgumentError('Max list length is 0xFFFFFFFF');
     }
   }
 

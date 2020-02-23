@@ -29,7 +29,7 @@ void iterableAndMap() {
   final list = ['i1', 'i2'];
   final map = {'k1': 11, 'k2': 22};
   final p = Packer();
-  p.packIterableLength(list.length);
+  p.packListLength(list.length);
   list.forEach(p.packString);
   p.packMapLength(map.length);
   map.forEach((key, v) {
@@ -39,7 +39,7 @@ void iterableAndMap() {
   final bytes = p.takeBytes();
 
   final u = Unpacker(bytes);
-  final listLength = u.unpackIterableLength();
+  final listLength = u.unpackListLength();
   for (int i = 0; i < listLength; i++) {
     print(u.unpackString());
   }
@@ -58,7 +58,7 @@ void differentTypesComplex() {
     ..packNull()
     ..packString(null)
     ..packBinary(<int>[104, 105]) // hi codes
-    ..packIterableLength(2) // pack 2 elements list ['elem1',3.14]
+    ..packListLength(2) // pack 2 elements list ['elem1',3.14]
     ..packString('elem1')
     ..packDouble(3.14)
     ..packString('continue to pack other elements')

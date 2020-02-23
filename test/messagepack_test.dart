@@ -199,24 +199,24 @@ void main() {
     ];
     final p = Packer();
     p.packNull();
-    p.packIterableLength(null);
-    p.packIterableLength(0);
-    p.packIterableLength(list.length);
+    p.packListLength(null);
+    p.packListLength(0);
+    p.packListLength(list.length);
     list.forEach(p.packString);
     p.packBool(true);
-    p.packIterableLength(list.length);
+    p.packListLength(list.length);
     list.forEach(p.packString);
     p.packInt(3);
     final u = Unpacker(p.takeBytes());
-    expect(u.unpackIterableLength(), equals(0));
-    expect(u.unpackIterableLength(), equals(0));
-    expect(u.unpackIterableLength(), equals(0));
-    final length = u.unpackIterableLength();
+    expect(u.unpackListLength(), equals(0));
+    expect(u.unpackListLength(), equals(0));
+    expect(u.unpackListLength(), equals(0));
+    final length = u.unpackListLength();
     for (int i = 0; i < length; i++) {
       expect(u.unpackString(), equals(list[i]));
     }
     expect(u.unpackBool(), equals(true));
-    final length2 = u.unpackIterableLength();
+    final length2 = u.unpackListLength();
     for (int i = 0; i < length2; i++) {
       expect(u.unpackString(), equals(list[i]));
     }
@@ -248,7 +248,7 @@ void main() {
       100.0,
     ];
     final p = Packer();
-    p.packIterableLength(list.length);
+    p.packListLength(list.length);
     for (int i = 0; i < 10; i++) {
       p.packInt(list[i] as int);
     }
@@ -262,7 +262,7 @@ void main() {
       p.packDouble(list[i] as double);
     }
     final u = Unpacker(p.takeBytes());
-    expect(u.unpackIterableLength(), equals(list.length));
+    expect(u.unpackListLength(), equals(list.length));
     for (int i = 0; i < 10; i++) {
       expect(u.unpackInt(), equals(list[i]));
     }
@@ -340,23 +340,35 @@ void main() {
 
   test('Manual int example [dependent]', () {
     final p = Packer();
-    p.packInt(1);
-    p.packInt(2);
-    final bytes = p.takeBytes();
-    //send bytes to server
+    p.packInt(1); // packet format version
+    p.packInt(222); // user id
+    p.packBool(true); // broadcast message to others
+    p.packString('hi'); // user message text
+    final bytes = p.takeBytes(); //Uint8List
+    //yourFunctionSendToServer(bytes); //sends [1, 204, 222, 195, 162, 104, 105]
+    // 1 encodes to 1 byte with value 1
+    // 222 encodes to 2 bytes with values [204, 222] because 222 > 127
+    // true encodes to 1 byte with value 195
+    // 'hi' encodes to 3 bytes with first byte containing str length info and other 2 bytes hold symbols values
+    // For more information, refer to the msgpack documentation
+    print(bytes);
     //receive bytes from server
     final u = Unpacker(bytes);
-    final n1 = u.unpackInt();
-    final n2 = u.unpackInt();
-    expect(n1, equals(1));
-    expect(n2, equals(2));
+    final version = u.unpackInt();
+    final userId = u.unpackInt();
+    final broadcast = u.unpackBool();
+    final message = u.unpackString();
+    expect(version, equals(1));
+    expect(userId, equals(222));
+    expect(broadcast, equals(true));
+    expect(message, equals('hi'));
   });
 
   test('Map Iterable example [dependent]', () {
     final list = ['i1', 'i2'];
     final map = {'k1': 11, 'k2': 22};
     final p = Packer();
-    p.packIterableLength(list.length);
+    p.packListLength(list.length);
     list.forEach(p.packString);
     p.packMapLength(map.length);
     map.forEach((key, v) {
@@ -367,22 +379,38 @@ void main() {
     Unpacker(bytes);
   });
 
+  test('Map automatically', () {
+    final list = ['i1', 'i2'];
+    final p = Packer();
+    p.packListLength(list.length);
+    list.forEach(p.packString);
+    final bytes = p.takeBytes();
+    final u = Unpacker(bytes);
+    final l = u.unpackList();
+    print(l);
+  });
+
   test('Different types example [dependent]', () {
     final p = Packer()
+      ..packListLength(10) //pack 10 different types items to list
       ..packInt(99)
       ..packBool(true)
       ..packString('hi')
       ..packNull()
       ..packString(null)
       ..packBinary(<int>[104, 105]) // hi codes
-      ..packIterableLength(2) // pack 2 elements list ['elem1',3.14]
+      ..packListLength(2) // pack 2 elements list ['elem1',3.14]
       ..packString('elem1')
       ..packDouble(3.14)
       ..packString('continue to pack other elements')
       ..packMapLength(1) //map {'key1':false}
-      ..packString('key');
+      ..packString('key1')
+      ..packBool(false)
+      ..packInt(9223372036854775807);
 
     final bytes = p.takeBytes();
-    Unpacker(bytes);
+    final u = Unpacker(bytes);
+    final l = u.unpackList();
+    print(l);
   });
 }

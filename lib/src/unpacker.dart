@@ -91,7 +91,10 @@ class Unpacker {
   double unpackDouble() {
     final b = _d.getUint8(_offset);
     double v;
-    if (b == 0xcb) {
+    if (b == 0xca) {
+      v = _d.getFloat32(++_offset);
+      _offset += 8;
+    } else if (b == 0xcb) {
       v = _d.getFloat64(++_offset);
       _offset += 8;
     } else if (b == 0xc0) {
@@ -140,12 +143,12 @@ class Unpacker {
     return _strCodec.decode(data);
   }
 
-  /// Unpack [Iterable.length] if packed value is an [Iterable] or `null`.
+  /// Unpack [List.length] if packed value is an [List] or `null`.
   ///
   /// Encoded in msgpack packet null or 0 length unpacks to 0 for convenience.
-  /// Items of the [Iterable] must be unpacked manually with respect to returned `length`
-  /// Throws [FormatException] if value is not an [Iterable].
-  int unpackIterableLength() {
+  /// Items of the [List] must be unpacked manually with respect to returned `length`
+  /// Throws [FormatException] if value is not an [List].
+  int unpackListLength() {
     final b = _d.getUint8(_offset);
     int len;
     if (b & 0xF0 == 0x90) {
@@ -162,7 +165,7 @@ class Unpacker {
       len = _d.getUint32(++_offset);
       _offset += 4;
     } else {
-      throw _formatException('Iterable length', b);
+      throw _formatException('List length', b);
     }
     return len;
   }
@@ -220,6 +223,68 @@ class Unpacker {
     Uint8List.view(_list.buffer, _list.offsetInBytes + _offset, len);
     _offset += len;
     return data.toList();
+  }
+
+  Object _unpack() {
+    final b = _d.getUint8(_offset);
+    if (b <= 0x7f ||
+        b >= 0xe0 ||
+        b == 0xcc ||
+        b == 0xcd ||
+        b == 0xce ||
+        b == 0xcf ||
+        b == 0xd0 ||
+        b == 0xd1 ||
+        b == 0xd2 ||
+        b == 0xd3) {
+      return unpackInt();
+    } else if (b == 0xc0 || b == 0xc2 || b == 0xc3) {
+      return unpackBool(); //null included
+    } else if (b == 0xca || b == 0xcb) {
+      return unpackDouble();
+    } else if ((b & 0xE0) == 0xA0 ||
+        b == 0xc0 ||
+        b == 0xd9 ||
+        b == 0xda ||
+        b == 0xdb) {
+      return unpackString();
+    } else if (b == 0xc4 || b == 0xc5 || b == 0xc6) {
+      return unpackBinary();
+    } else if ((b & 0xF0) == 0x90 || b == 0xdc || b == 0xdd) {
+      return unpackList();
+    } else if ((b & 0xF0) == 0x80 || b == 0xde || b == 0xdf) {
+      return unpackMap();
+    } else {
+      throw _formatException('Unknown', b);
+    }
+  }
+
+  /// Automatically unpacks `bytes` to [List] where items has corresponding data types.
+  ///
+  /// Return types declared as [Object] instead of `dynamic` for safety reasons.
+  /// You need explicitly cast to proper types. And in case with [Object]
+  /// compiler checks will force yo to do it whereas with `dynamic` it will not.
+  List<Object> unpackList() {
+    final length = unpackListLength();
+    final list = List<Object>(length);
+    for (int i = 0; i < length; i++) {
+      list[i] = _unpack();
+    }
+    return list;
+  }
+
+  /// Automatically unpacks `bytes` to [Map] where key and values has corresponding data types.
+  ///
+  /// Return types declared as [Object] instead of `dynamic` for safety reasons.
+  /// You need explicitly cast to proper types. And in case with [Object]
+  /// compiler checks will force yo to do it whereas with `dynamic` it will not.
+  Map<Object, Object> unpackMap() {
+    final length = unpackMapLength();
+    final map = <Object, Object>{};
+    for (int i = 0; i < length; i++) {
+      map[_unpack()] = _unpack();
+    }
+    return map;
   }
 
   Exception _formatException(String type, int b) =>
