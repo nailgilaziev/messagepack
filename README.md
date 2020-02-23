@@ -2,19 +2,21 @@ Streaming API implementation of [MessagePack](https://msgpack.org/) binary seria
 
 [![pub package](https://img.shields.io/pub/v/messagepack.svg)](https://pub.dartlang.org/packages/messagepack)
 
-# The basics
+## The basics
 
-`Packer` and `Unpacker` classes provide Streaming API for serializing and deserializing data.
+`Packer` and `Unpacker` classes provide Streaming API for serializing and deserializing data.  
 `Unpacker` also provide automatic unpacking `Map` and `List` by implicitly unpacking internal items.
 
-# Streaming API Example - Simple
+## Streaming API Example - Simple
 
 For the simplest data packaging to bytes packet like this: 
+```
 -------------------------------------------   
 | version | userId | broadcast? | message |
 -------------------------------------------
+```
 
-## Packer
+### Packer part
 
 ```dart
 import 'package:messagepack/messagepack.dart';
@@ -29,17 +31,17 @@ p.packString('hi'); // user message text
 final bytes = p.takeBytes(); //Uint8List
 yourFunctionSendToServer(bytes); //sends [1, 204, 222, 195, 162, 104, 105]
 ```
-> 1 encodes to 1 byte with value 1
-> 222 encodes to 2 bytes with values [204, 222] because 222 > 127
-> true encodes to 1 byte with value 195
-> 'hi' encodes to 3 bytes with first byte containing str length info and other 2 bytes hold symbols values
-> For more information, refer to the msgpack documentation
+> `1` encodes to 1 byte with value 1.  
+> `222` encodes to 2 bytes with values [204, 222] because 222 > 127.  
+> `true` encodes to 1 byte with value 195.  
+> `'hi'` encodes to 3 bytes with first byte containing str length info and other 2 bytes hold symbols values.  
 
-Here packing format process not like the way we usually pack data in json, by specifying keys. 
- 
+> For more information, refer to the [msgpack](https://msgpack.org/) documentation.  
+
+Streaming packing process not like the way we usually pack data in json, by specifying keys.  
 The current example is more like how data is packed in TCP/IP frame structure.
 
-## Unpacker
+### Unpacker part
 
 ```dart
 final List<int> rawBytes = yourFunctionReceiveFromServer(); // receive List<int> bytes from server
@@ -57,7 +59,7 @@ expect(message, equals('hi'));
 
 ```
 
-# Example - Streaming packing and automatic/implicit unpacking 
+## Streaming packing and automatic/implicit unpacking example - complex
 
 ```dart
 final p = Packer()
@@ -86,11 +88,11 @@ print(l);
 // [99, true, hi, null, null, [104, 105], [elem1, 3.14], continue to pack other elements, {key1: false}, 9223372036854775807]
 ```
 
-Explicitly cast items to corresponding types.
+`List<Object>` items explicitly casted to corresponding types when using.
 
-# NOTES
+## NOTES
 
-## Packing Maps and Lists
+### Packing Maps and Lists
 * firstly, pack Map or List header length 
 * secondly, manually pack all items - that's all 
 
@@ -112,23 +114,23 @@ map.forEach((key, v) {
 final bytes = p.takeBytes();
 ```
 
-## More examples
+### More examples
 
 More examples can be found in:
 * `test/messagepack_test.dart`
 * `example/example.dart`
 
-## Don't use Packer after calling .takeBytes()
+### Don't use Packer after calling .takeBytes()
 
 Internally it cleans up underlying _builder, so further behaviour will be useless.  
 Call .takeBytes() only once. It returns Uint8List of packed bytes.
 After that call don't continue to use Packer instance (don't call .packXXX() methods and .takeBytes())
 Instead, create new Packer instance method.
 
-## Motivation for creating this package
+### Motivation for creating this package
 
 No other packages available that give streaming API for processing data 
 
-# Contributing
+## Contributing
 
 If you have advice how to improve library code or making it lighter or blazingly faster - don't hesitate to open an issue or pull request!
