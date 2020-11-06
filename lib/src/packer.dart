@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:io';
 import 'dart:typed_data';
 
 /// Streaming API for packing (serializing) data to msgpack binary format.

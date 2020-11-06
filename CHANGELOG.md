@@ -1,3 +1,7 @@
+## [0.1.2]
+
+* Web support
+
 ## [0.1.1]
 
 * New functions for _implicitly/automatically_ unpack `Map` and `List` items without using **Streaming API** directly.
