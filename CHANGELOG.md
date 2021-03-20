@@ -1,3 +1,8 @@
+## [0.2.0]
+
+* Migrate to null safety
+* Require Dart SDK 2.12 or later
+
 ## [0.1.2]
 
 * Web support

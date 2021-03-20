@@ -24,9 +24,9 @@ class Unpacker {
   /// Unpack value if it exist. Otherwise returns `null`.
   ///
   /// Throws [FormatException] if value is not a bool,
-  bool unpackBool() {
+  bool? unpackBool() {
     final b = _d.getUint8(_offset);
-    bool v;
+    bool? v;
     if (b == 0xc2) {
       v = false;
       _offset += 1;
@@ -45,9 +45,9 @@ class Unpacker {
   /// Unpack value if it exist. Otherwise returns `null`.
   ///
   /// Throws [FormatException] if value is not an integer,
-  int unpackInt() {
+  int? unpackInt() {
     final b = _d.getUint8(_offset);
-    int v;
+    int? v;
     if (b <= 0x7f || b >= 0xe0) {
       /// Int value in fixnum range [-32..127] encoded in header 1 byte
       v = _d.getInt8(_offset);
@@ -88,9 +88,9 @@ class Unpacker {
   /// Unpack value if it exist. Otherwise returns `null`.
   ///
   /// Throws [FormatException] if value is not a Double.
-  double unpackDouble() {
+  double? unpackDouble() {
     final b = _d.getUint8(_offset);
-    double v;
+    double? v;
     if (b == 0xca) {
       v = _d.getFloat32(++_offset);
       _offset += 8;
@@ -110,7 +110,7 @@ class Unpacker {
   ///
   /// Empty
   /// Throws [FormatException] if value is not a String.
-  String unpackString() {
+  String? unpackString() {
     final b = _d.getUint8(_offset);
     if (b == 0xc0) {
       _offset += 1;
@@ -225,7 +225,7 @@ class Unpacker {
     return data.toList();
   }
 
-  Object _unpack() {
+  Object? _unpack() {
     final b = _d.getUint8(_offset);
     if (b <= 0x7f ||
         b >= 0xe0 ||
@@ -264,13 +264,9 @@ class Unpacker {
   /// Return types declared as [Object] instead of `dynamic` for safety reasons.
   /// You need explicitly cast to proper types. And in case with [Object]
   /// compiler checks will force you to do it whereas with `dynamic` it will not.
-  List<Object> unpackList() {
+  List<Object?> unpackList() {
     final length = unpackListLength();
-    final list = List<Object>(length);
-    for (int i = 0; i < length; i++) {
-      list[i] = _unpack();
-    }
-    return list;
+    return List.generate(length, (_) => _unpack());
   }
 
   /// Automatically unpacks `bytes` to [Map] where key and values has corresponding data types.
@@ -278,13 +274,9 @@ class Unpacker {
   /// Return types declared as [Object] instead of `dynamic` for safety reasons.
   /// You need explicitly cast to proper types. And in case with [Object]
   /// compiler checks will force you to do it whereas with `dynamic` it will not.
-  Map<Object, Object> unpackMap() {
+  Map<Object?, Object?> unpackMap() {
     final length = unpackMapLength();
-    final map = <Object, Object>{};
-    for (int i = 0; i < length; i++) {
-      map[_unpack()] = _unpack();
-    }
-    return map;
+    return {for (var i = 0; i < length; i++) _unpack(): _unpack()};
   }
 
   Exception _formatException(String type, int b) => FormatException(

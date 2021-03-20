@@ -21,9 +21,9 @@ class Packer {
 
   int _bufSize;
 
-  Uint8List _buf;
-  ByteData _d;
-  int _offset;
+  late Uint8List _buf;
+  late ByteData _d;
+  int _offset = 0;
 
   void _newBuf(int size) {
     _buf = Uint8List(size);
@@ -72,7 +72,7 @@ class Packer {
   }
 
   /// Pack [bool] or `null`.
-  void packBool(bool v) {
+  void packBool(bool? v) {
     if (_buf.length - _offset < 1) _nextBuf();
     if (v == null) {
       _d.setUint8(_offset++, 0xc0);
@@ -82,7 +82,7 @@ class Packer {
   }
 
   /// Pack [int] or `null`.
-  void packInt(int v) {
+  void packInt(int? v) {
     // max 8 byte int + 1 control byte
     if (_buf.length - _offset < 9) _nextBuf();
     if (v == null) {
@@ -127,7 +127,7 @@ class Packer {
   }
 
   /// Pack [double] or `null`.
-  void packDouble(double v) {
+  void packDouble(double? v) {
     // 8 byte double + 1 control byte
     if (_buf.length - _offset < 9) _nextBuf();
     if (v == null) {
@@ -150,7 +150,7 @@ class Packer {
   /// ```
   /// - Empty and `null` distinguishable: no action required just save `p.packString(s)`.
   /// Throws [ArgumentError] if [String.length] exceed (2^32)-1.
-  void packString(String v) {
+  void packString(String? v) {
     // max 4 byte str header + 1 control byte
     if (_buf.length - _offset < 5) _nextBuf();
     if (v == null) {
@@ -181,8 +181,8 @@ class Packer {
   /// Convenient function that call [packString(v)] by passing empty [String] as `null`.
   ///
   /// Convenient when you not distinguish between empty [String] and null on msgpack wire.
-  /// See [packString(v)] method documentation for more details.
-  void packStringEmptyIsNull(String v) {
+  /// See [packString] method documentation for more details.
+  void packStringEmptyIsNull(String? v) {
     if (v == null || v.isEmpty)
       packNull();
     else
@@ -190,7 +190,7 @@ class Packer {
   }
 
   /// Pack `List<int>` or null.
-  void packBinary(List<int> buffer) {
+  void packBinary(List<int>? buffer) {
     // max 4 byte binary header + 1 control byte
     if (_buf.length - _offset < 5) _nextBuf();
     if (buffer == null) {
@@ -216,7 +216,7 @@ class Packer {
   }
 
   /// Pack [List.length] or `null`.
-  void packListLength(int length) {
+  void packListLength(int? length) {
     // max 4 length header + 1 control byte
     if (_buf.length - _offset < 5) _nextBuf();
     if (length == null) {
@@ -237,7 +237,7 @@ class Packer {
   }
 
   /// Pack [Map.length] or `null`.
-  void packMapLength(int length) {
+  void packMapLength(int? length) {
     // max 4 byte header + 1 control byte
     if (_buf.length - _offset < 5) _nextBuf();
     if (length == null) {
