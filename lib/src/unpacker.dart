@@ -93,7 +93,7 @@ class Unpacker {
     double v;
     if (b == 0xca) {
       v = _d.getFloat32(++_offset);
-      _offset += 8;
+      _offset += 4;
     } else if (b == 0xcb) {
       v = _d.getFloat64(++_offset);
       _offset += 8;
