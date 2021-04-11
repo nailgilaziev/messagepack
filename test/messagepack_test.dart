@@ -4,7 +4,7 @@ import 'dart:math';
 import 'package:messagepack/messagepack.dart';
 import 'package:test/test.dart';
 
-int packUnpackInt(int v, {bool negative = false}) {
+int? packUnpackInt(int? v, {bool negative = false}) {
   final p = Packer();
   if (negative)
     p.packInt(v);
@@ -14,14 +14,14 @@ int packUnpackInt(int v, {bool negative = false}) {
   return u.unpackInt();
 }
 
-double packUnpackDouble(double v) {
+double? packUnpackDouble(double? v) {
   final p = Packer();
   p.packDouble(v);
   final u = Unpacker(p.takeBytes());
   return u.unpackDouble();
 }
 
-String packUnpackString(String v) {
+String? packUnpackString(String? v) {
   final p = Packer();
   p.packString(v);
   final u = Unpacker(p.takeBytes());
@@ -40,7 +40,7 @@ final ints = [
   128,
 ];
 
-final negativeInts = ints.map((e) => e == null ? null : -1 * e).toList()
+final negativeInts = ints.map<int?>((e) => e == null ? null : -1 * e).toList()
   ..add(-9223372036854775808);
 
 final doubles = [
@@ -150,11 +150,11 @@ void main() {
 
   void pack(Packer p, MapEntry<int, dynamic> e) {
     if (e.key == 0) p.packNull();
-    if (e.key == 1) p.packBool(e.value as bool);
-    if (e.key == 2) p.packInt(e.value as int);
-    if (e.key == 3) p.packInt(e.value as int);
-    if (e.key == 4) p.packDouble(e.value as double);
-    if (e.key == 5) p.packString(e.value as String);
+    if (e.key == 1) p.packBool(e.value as bool?);
+    if (e.key == 2) p.packInt(e.value as int?);
+    if (e.key == 3) p.packInt(e.value as int?);
+    if (e.key == 4) p.packDouble(e.value as double?);
+    if (e.key == 5) p.packString(e.value as String?);
   }
 
   dynamic unpack(Unpacker u, int type) {
@@ -250,16 +250,16 @@ void main() {
     final p = Packer();
     p.packListLength(list.length);
     for (int i = 0; i < 10; i++) {
-      p.packInt(list[i] as int);
+      p.packInt(list[i] as int?);
     }
     for (int i = 10; i < 13; i++) {
-      p.packString(list[i] as String);
+      p.packString(list[i] as String?);
     }
     for (int i = 13; i < 16; i++) {
-      p.packBool(list[i] as bool);
+      p.packBool(list[i] as bool?);
     }
     for (int i = 16; i < 21; i++) {
-      p.packDouble(list[i] as double);
+      p.packDouble(list[i] as double?);
     }
     final u = Unpacker(p.takeBytes());
     expect(u.unpackListLength(), equals(list.length));
