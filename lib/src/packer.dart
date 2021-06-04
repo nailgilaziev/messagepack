@@ -50,6 +50,30 @@ class Packer {
     ));
   }
 
+  // Pack generic value
+  void packGeneric(dynamic? v) {
+    switch(v.runtimeType) {
+      case int:
+        packInt(v as int?);
+        break;
+      case bool:
+        packBool(v as bool?);
+        break;
+      case double:
+        packDouble(v as double?);
+        break;
+      case String:
+        packString(v as String?);
+        break;
+      case List:
+        packBinary(v as List<int>?);
+        break;
+      default:
+        throw new TypeError();
+        break;
+    }
+  }
+
   /// Pack binary and string uses this internally.
   void _putBytes(List<int> bytes) {
     final length = bytes.length;
