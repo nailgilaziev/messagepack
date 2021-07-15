@@ -222,7 +222,7 @@ class Unpacker {
     final data =
         Uint8List.view(_list.buffer, _list.offsetInBytes + _offset, len);
     _offset += len;
-    return data.toList();
+    return data;
   }
 
   Object? _unpack() {
