@@ -114,12 +114,12 @@ class MyData {
   void add(int key, MyData child) => children[key] = child;
   @override
   bool operator ==(Object other) {
-    if (!(other is MyData &&
-        other.data == data &&
-        other.children.length == children.length)) return false;
+    if (!(other is MyData) ||
+        other.runtimeType != runtimeType ||
+        other.data != data ||
+        other.children.length != children.length) return false;
     for (final item in children.entries) {
-      if (!other.children.containsKey(item.key) ||
-          other.children[item.key] != item.value) return false;
+      if (other.children[item.key] != item.value) return false;
     }
     return true;
   }
@@ -127,8 +127,8 @@ class MyData {
   @override
   int get hashCode => Object.hash(data, children);
 
-  late int data;
-  late Map<int, MyData> children;
+  int data;
+  Map<int, MyData> children;
 }
 
 void main() {
@@ -388,13 +388,21 @@ void main() {
     p.packBool(true);
     p.packBinary(bytes2);
     p.packInt(3);
-    final u = Unpacker(p.takeBytes());
+    final packedBytes = p.takeBytes();
+    final u = Unpacker(packedBytes);
     expect(u.unpackBinary(), equals(empty));
     expect(u.unpackBinary(), equals(empty));
     expect(u.unpackBinary(), equals(bytes1));
     expect(u.unpackBool(), equals(true));
     expect(u.unpackBinary(), equals(bytes2));
     expect(u.unpackInt(), equals(3));
+    final u2 = Unpacker(packedBytes);
+    expect(u2.unpackBinaryUint8(), equals(empty));
+    expect(u2.unpackBinaryUint8(), equals(empty));
+    expect(u2.unpackBinaryUint8(), equals(bytes1));
+    expect(u2.unpackBool(), equals(true));
+    expect(u2.unpackBinaryUint8(), equals(bytes2));
+    expect(u2.unpackInt(), equals(3));
   });
 
   test('Manual int example [dependent]', () {
