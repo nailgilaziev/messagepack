@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:math';
+import 'dart:typed_data';
 
 import 'package:messagepack/messagepack.dart';
 import 'package:test/test.dart';
@@ -71,6 +72,64 @@ final strs = [
   'str containing  кириллицу',
   'hi'
 ];
+
+/// Example recursive datastruct and one way to pack/unpack.
+class MyData {
+  MyData(this.data) : children = {};
+  MyData._new(this.data, this.children);
+
+  static MyData unpack(Uint8List bytes) {
+    final u = Unpacker(bytes);
+    return _unpack(u);
+  }
+
+  static MyData _unpack(Unpacker u) {
+    final data = u.unpackInt()!;
+    final children = <int, MyData>{};
+    final mapLength = u.unpackMapLength();
+    for (var i = 0; i < mapLength; ++i) {
+      final key = u.unpackInt();
+      if (key != null) {
+        children[key] = _unpack(u);
+      }
+    }
+    return MyData._new(data, children);
+  }
+
+  Uint8List pack() {
+    final p = Packer();
+    _pack(p);
+    return p.takeBytes();
+  }
+
+  void _pack(Packer p) {
+    p.packInt(data);
+    p.packMapLength(children.length);
+    for (final MapEntry<int, MyData> entry in children.entries) {
+      p.packInt(entry.key);
+      entry.value._pack(p);
+    }
+  }
+
+  void add(int key, MyData child) => children[key] = child;
+  @override
+  bool operator ==(Object other) {
+    if (!(other is MyData &&
+        other.data == data &&
+        other.children.length == children.length)) return false;
+    for (final item in children.entries) {
+      if (!other.children.containsKey(item.key) ||
+          other.children[item.key] != item.value) return false;
+    }
+    return true;
+  }
+
+  @override
+  int get hashCode => Object.hash(data, children);
+
+  late int data;
+  late Map<int, MyData> children;
+}
 
 void main() {
   test('int sequentially increasing [independent]', () {
@@ -412,5 +471,23 @@ void main() {
     final u = Unpacker(bytes);
     final l = u.unpackList();
     print(l);
+  });
+
+  test('Recursive strutures', () {
+    final myData = MyData(0);
+    myData.add(11, MyData(1));
+    myData.add(12, MyData(2)..add(33, MyData(4)));
+    myData.add(13, MyData(3));
+    final bytes = myData.pack();
+    print('encoded length: ${bytes.lengthInBytes}');
+
+    final unpackedData = MyData.unpack(bytes);
+    expect(myData.data, unpackedData.data);
+    final otherChildren = unpackedData.children;
+    expect(otherChildren, containsPair(11, MyData(1)));
+    expect(otherChildren, containsPair(12, MyData(2)..add(33, MyData(4))));
+    expect(otherChildren, containsPair(13, MyData(3)));
+    expect(myData.children.length, otherChildren.length);
+    expect(myData, equals(unpackedData));
   });
 }
